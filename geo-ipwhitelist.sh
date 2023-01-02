@@ -59,7 +59,7 @@ http:
   middlewares:
     ${middlewareName}:
       ipWhiteList:
-        sourcerange:
+        sourceRange:
 EOF
 
   #Extract ipv4 and ipv6 lists, reformat to just ip and geonameID, and append in new file
