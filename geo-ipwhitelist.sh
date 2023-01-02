@@ -2,7 +2,7 @@
 
 #This script downloads country-wide IP lists and formats into a forwardauth middleware to make a local geolocation ipWhiteList for Traefik
 #The country IP data is obtained from the GeoLite2 csv database created by maxmind
-#Accessing the GeoLite 2 database is free but requires an account and licence key, see maxmind.com 
+#Accessing the GeoLite 2 database is free but requires an account and licence key, see maxmind.com
 
 #VARIABLES
 ################
@@ -66,17 +66,17 @@ EOF
   unzip -jd countryIPList countryIPList.zip "*Blocks*.csv" "*Country-Locations-en.csv"
   cat countryIPList/*Blocks*.csv | cut -d, -f 1-2 > countryIPList/globalIPList.txt
 
-  #Add comment to middleware file with which countries included in whitelist 
+  #Add comment to middleware file with which countries included in whitelist
   echo "         # ipWhiteList countries: ${countryCodes[@]}" >> ${middlewareFilePath}
-    
+
   for country in ${countryCodes[@]}; do
-    #Extract geonameID for each country  
+    #Extract geonameID for each country
     geoNameId=$( grep "${country}" countryIPList/*-en.csv | cut -d, -f1 )
     echo "         # ${country} IPs" >> ${middlewareFilePath}
     #Grab every IP listed in that country, reformat, append to middleware file
-    grep ${geoNameId} countryIPList/globalIPList.txt | cut -d, -f1 | sed 's/^/          - /' >> ${middlewareFilePath}
-  done    
-  
+    grep ${geoNameId} countryIPList/globalIPList.txt | cut -d, -f1 | sed 's/[^[:space:],]\+/          - "&"/g' >> ${middlewareFilePath}
+  done
+
   # Delete zip and extracted files
   rm -r countryIPList*
   echo "${lastModifiedFilename} has been updated, ipWhiteList countries are ${countryCodes[@]}"
